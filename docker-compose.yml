@@ -1,0 +1,31 @@
+version: '2.3'
+services:
+  yolov11atn:
+    image: zelias/yolov11atn:v9
+    runtime: nvidia
+    privileged: true
+    stdin_open: true  # Equivalent to -i
+    tty: true         # Equivalent to -t
+    environment:
+      - DISPLAY=$DISPLAY
+      - XAUTHORITY=/root/.Xauthority
+    ports:
+      - "8888:8888"
+      - "7860:7860"
+      - "7866:7866"
+    volumes:
+      - .:/app
+      - /tmp/argus_socket:/tmp/argus_socket
+      - /etc/enctune.conf:/etc/enctune.conf
+      - /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra
+      - /usr/lib/aarch64-linux-gnu/gstreamer-1.0:/usr/lib/aarch64-linux-gnu/gstreamer-1.0
+      - /usr/src/jetson_multimedia_api:/usr/src/jetson_multimedia_api
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ~/.Xauthority:/root/.Xauthority:rw
+    devices:
+      - "/dev/video0:/dev/video0"
+      - "/dev/video1:/dev/video1"
+    network_mode: "host"  # This ensures X11 forwarding works properly
+    working_dir: /app
+    command: python3 yolo_gsT.py
+    restart: unless-stopped  # Automatically restart if the script crashes
